@@ -1,12 +1,13 @@
 {
-  "name": "thesis_submitter",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "fireats",
+  "version": "0.0.0",
+  "description": "Finished code for the Firestore codelab",
+  "main": ".",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "fmt": "prettier --write scripts/* styles/*"
   },
-  "keywords": [],
   "author": "",
-  "license": "ISC"
+  "devDependencies": {
+    "prettier": "^1.5.3"
+  }
 }
