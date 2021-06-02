@@ -1,0 +1,21 @@
+extends layout
+
+block layout-content
+    div.View.WelcomeView
+        h1.Banner Thesis Topic Submitter
+        div.Message
+            div.Title
+                h1 Please sign in
+            div.Details
+                label( for="inputEmail" class="sr-only") Email address
+            div.Details
+                input(type="email" name="username" id="inputEmail" class="form-control" placeholder="Email address" required autofocus)
+            div.Details
+                label(for="inputPassword" class="sr-only") Password
+            div.Details
+                input(type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required)
+            div.NavButtons
+                a(href="/student")
+                    div.NavButton I'm a Student
+                a(href="/promoter")
+                    div.NavButton I'm a Promoter
