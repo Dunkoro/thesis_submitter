@@ -73,9 +73,9 @@ a {
 
     font-family: "Merriweather Sans", sans-serif;
 }
-
 .Banner {
     display: flex;
+    justify-self: start;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -93,69 +93,42 @@ a {
     border-bottom: var(--ui-shadow-border);
     box-shadow: var(--ui-shadow);
 }
-
-.Message {
+.Form {
     display: flex;
     align-self: center;
+    justify-self: center;
+
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
-    width: 22%;
 
     background: white;
     padding: 30px;
     border-bottom: var(--ui-shadow-border);
     box-shadow: var(--ui-shadow);
 }
-
-.Message > .Title {
+.Title {
     padding-bottom: 20px;
 }
-
-.Message > .Details {
+.Details {
     display: flex;
     flex-direction: column;
     line-height: 1.5em;
 }
-
 .NavButtons {
     width: 100%;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
     padding: 20px 10px 10px 10px;
-}
-
-.NavButton {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    height: 55px;
-    width: 150px;
-
-    background: #fa4141;
-
-    border-radius: 30px;
-
-    font-size: 16px;
-    font-weight: bold;
-    color: white;
-
-    text-transform: capitalize;
-
-    border-bottom: var(--ui-shadow-border);
-    box-shadow: var(--ui-shadow);
 }
 
 .WelcomeView {
     background: url("https://upload.wikimedia.org/wikipedia/commons/f/ff/Politechnika_Wroclawska_-_budynek_glowny.jpg") left bottom;
     background-size: cover;
 }
-
-.StudentView {
-    background: url("https://cdn.auth0.com/blog/whatabyte-portal/patio.jpeg") left bottom;
+.UserView {
+    background: url("https://live.staticflickr.com/7385/8924365702_2e0a989d35_b.jpg") left bottom;
     background-size: cover;
 }
 
@@ -183,9 +156,29 @@ a {
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
 }
+input[type=submit] {
+    background: darkred;
+    color: white;
+    border-style: outset;
+    border-color: darkred;
+    height: 60px;
+    width: 100%;
+    font: bold 15px arial, sans-serif;
+    text-shadow:none;
+}
+input[type=submit]:disabled {
+    align-self: center;
+    background: darkgray;
+    color: white;
+    border-style: outset;
+    border-color: darkgray;
+    font: bold 15px arial, sans-serif;
+    text-shadow:none;
+}
 input:invalid {
     background-color: #ffdddd;
 }
-form:invalid {
-    border: 5px solid #ffdddd;
+.dummy{
+    min-width: 0;
+    min-height: 0;
 }

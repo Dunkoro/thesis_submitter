@@ -1,13 +1,25 @@
 extends layout
 
 block layout-content
+
     div.View.UserView
-        h1.Banner #{userProfile.nickname}
-        div.Message
+        h1.Banner Thesis Submission
+        div.Form
             div.Title
-                h3 Making Us the Best
-                h1 Teammate Profile
-            pre.Details=JSON.stringify(userProfile, null, 2)
-        div.NavButtons
-            a(href="/logout")
-                div.NavButton Log out
+                h1 Thesis is
+                h1 !{thesisStatus}
+            form(method='POST' action="/submitThesis")
+                div.Details
+                    label(for="thesisTopicPolish" class="sr-only") Polish Thesis Topic
+                    input(disabled=thesisDisabled value=thesisTopicPolish type="text" name="thesisTopicPolish" id="thesisTopicPolish" class="form-control" placeholder="Polish Thesis Topic" required autofocus)
+                div.Details
+                    label(for="thesisTopicEnglish" class="sr-only") English Thesis Topic
+                    input(disabled=thesisDisabled value=thesisTopicEnglish type="text" name="thesisTopicEnglish" id="thesisTopicEnglish" class="form-control" placeholder="English Thesis Topic" required)
+                div.Details
+                    label(for="promoter" class="sr-only") Promoter
+                    select(disabled=thesisDisabled name="promoter" id="promoter" class="form-control")
+                        each promoter in promoters
+                            option= promoter.email
+                div.NavButtons
+                    input(disabled=thesisDisabled type="submit" value="Submit Thesis")
+        div.dummy

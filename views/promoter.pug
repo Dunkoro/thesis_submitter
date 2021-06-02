@@ -2,12 +2,23 @@ extends layout
 
 block layout-content
     div.View.UserView
-        h1.Banner Howdy, #{userProfile.nickname}!
-        div.Message
+        h1.Banner Thesis Review
+        div.Form
             div.Title
-                h3 Making Us the Best
-                h1 Teammate Profile
-            pre.Details=JSON.stringify(userProfile, null, 2)
-        div.NavButtons
-            a(href="/logout")
-                div.NavButton Log out
+                h1 Accepted Thesis Topics
+            div.Details
+                select(name="acceptedTheses" id="acceptedTheses" class="form-control")
+                    each acceptedThesis in acceptedThesesList
+                        option= acceptedThesis.studentEmail + " " + acceptedThesis.topicPolish
+        div.Form
+            div.Title
+                h1 Pending Thesis Topics
+            form(method='POST' action="/reviewThesis")
+                div.Details
+                    select(name="reviewedThesis" id="reviewedThesis" class="form-control")
+                        each pendingThesis in pendingThesesList
+                            option= pendingThesis.studentEmail + " " + pendingThesis.topicPolish
+                div.NavButtons
+                    input(type="submit" name="accept" value="Accept Thesis Topic")
+                    input(type="submit" name="reject" value="Reject Thesis Topic")
+        div.dummy
