@@ -27,6 +27,10 @@ function signIn(email, password) {
         });
 }
 
+function signOut() {
+    return firebase.auth().signOut();
+}
+
 function getCurrentUser() {
     return firebase.auth().currentUser;
 }
@@ -78,6 +82,7 @@ async function reviewThesis(studentEmail, promoterEmail, status) {
 
 module.exports = {
     signIn,
+    signOut,
     getUser,
     getCurrentUser,
     getThesisByStudentEmail,

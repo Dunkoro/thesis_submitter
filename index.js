@@ -27,11 +27,48 @@ app.set("view engine", "pug");
 app.use(express.static(path.join(__dirname, "public")));
 
 /**
- * App Scripts
+ * Routes Definitions
  */
 
-function studentViewInitialization(res, req, user) {
-    firebaseWrapper.getThesisByStudentEmail(req.body.email)
+app.get("/", (req, res) => {
+    firebaseWrapper.signOut();
+    res.render("index", {title: "Home"});
+});
+
+app.post("/login", urlencodedParser, (req, res) => {
+    firebaseWrapper.signIn(req.body.email, req.body.password)
+        .then(signInResponse => {
+            if (signInResponse) {
+                firebaseWrapper.getUser(req.body.email)
+                    .then(users => {
+                        users.forEach(user => {
+                            if (user) {
+                                if (user.get("degree")) {
+                                    res.redirect("/student");
+                                } else {
+                                    res.redirect("/promoter");
+                                }
+                            } else {
+                                res.status(403);
+                                res.send("User Unauthorized!");
+                            }
+                        });
+                    })
+                    .catch((error) => console.log(error));
+            } else {
+                res.status(403);
+                res.send("User Unauthorized!");
+            }
+        });
+});
+
+app.get("/student", (req, res) => {
+    if (!firebaseWrapper.getCurrentUser()) {
+        res.redirect("/");
+        return;
+    }
+    let email = firebaseWrapper.getCurrentUser().email;
+    firebaseWrapper.getThesisByStudentEmail(email)
         .then(theses => {
             firebaseWrapper.getPotentialPromoters()
                 .then(promoters => {
@@ -41,7 +78,6 @@ function studentViewInitialization(res, req, user) {
                     });
                     let options = {
                         title: "Student",
-                        student: user,
                         promoters: promoterList
                     };
                     if (theses && theses.size === 1) {
@@ -58,16 +94,20 @@ function studentViewInitialization(res, req, user) {
                     res.render("student", options);
                 });
         });
-}
+});
 
-function promoterViewInitialization(res, req, user) {
+app.get("/promoter", (req, res) => {
+    if (!firebaseWrapper.getCurrentUser()) {
+        res.redirect("/");
+        return;
+    }
+    let email = firebaseWrapper.getCurrentUser().email;
     let options = {
-        title: "Promoter",
-        promoter: user
+        title: "Promoter"
     };
     let acceptedThesesList = [];
     let pendingThesesList = [];
-    firebaseWrapper.getThesesByPromoterEmail(req.body.email)
+    firebaseWrapper.getThesesByPromoterEmail(email)
         .then(theses => {
             theses.forEach(thesis => {
                 if (thesis.get("status") === "ACCEPTED") {
@@ -81,47 +121,12 @@ function promoterViewInitialization(res, req, user) {
 
             res.render("promoter", options);
         });
-}
-
-/**
- * Routes Definitions
- */
-
-app.get("/", (req, res) => {
-    res.render("index", {title: "Home"});
-});
-
-app.post("/login", urlencodedParser, (req, res) => {
-    firebaseWrapper.signIn(req.body.email, req.body.password)
-        .then(signInResponse => {
-            if (signInResponse) {
-                firebaseWrapper.getUser(req.body.email)
-                    .then(users => {
-                        users.forEach(user => {
-                            if (user) {
-                                if (user.get("degree")) {
-                                    studentViewInitialization(res, req, user);
-                                } else {
-                                    promoterViewInitialization(res, req, user);
-                                }
-                            } else {
-                                res.status(403);
-                                res.send("User Unauthorized!");
-                            }
-                        });
-                    })
-                    .catch((error) => console.log(error));
-            } else {
-                res.status(403);
-                res.send("User Unauthorized!");
-            }
-        });
 });
 
 app.post("/submitThesis", urlencodedParser, (req, res) => {
     firebaseWrapper.updateThesis(firebaseWrapper.getCurrentUser().email, req.body.promoter, req.body.thesisTopicPolish, req.body.thesisTopicEnglish, "PENDING");
 
-    res.redirect("/");
+    res.redirect("/student");
 });
 
 app.post("/reviewThesis", urlencodedParser, (req, res) => {
@@ -138,7 +143,7 @@ app.post("/reviewThesis", urlencodedParser, (req, res) => {
         console.log("Unexpected status!");
     }
 
-    res.redirect("/");
+    res.redirect("/promoter");
 });
 
 /**
