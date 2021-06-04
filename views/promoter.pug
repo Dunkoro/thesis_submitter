@@ -9,7 +9,7 @@ block layout-content
             div.Details
                 select(name="acceptedTheses" id="acceptedTheses" class="form-control")
                     each acceptedThesis in acceptedThesesList
-                        option= acceptedThesis.studentEmail + " " + acceptedThesis.topicPolish
+                        option= acceptedThesis.degree + " | " + acceptedThesis.studentFirstName + " " + acceptedThesis.studentLastName + " | " + acceptedThesis.topicPolish + " | " + acceptedThesis.topicEnglish
         div.Form
             div.Title
                 h1 Pending Thesis Topics
@@ -17,7 +17,7 @@ block layout-content
                 div.Details
                     select(name="reviewedThesis" id="reviewedThesis" class="form-control")
                         each pendingThesis in pendingThesesList
-                            option= pendingThesis.studentEmail + " " + pendingThesis.topicPolish
+                            option= pendingThesis.degree + " | " + pendingThesis.studentFirstName + " " + pendingThesis.studentLastName + " | " + pendingThesis.topicPolish + " | " + pendingThesis.topicEnglish
                 div.NavButtons
                     input(type="submit" name="accept" value="Accept Thesis Topic")
                     input(type="submit" name="reject" value="Reject Thesis Topic")

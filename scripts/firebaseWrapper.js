@@ -63,14 +63,22 @@ async function getThesesByPromoterEmail(email) {
 }
 
 async function updateThesis(studentEmail, promoterEmail, topicPolish, topicEnglish, status) {
-    let thesis = {
-        studentEmail: studentEmail,
-        promoterEmail: promoterEmail,
-        topicEnglish: topicEnglish,
-        topicPolish: topicPolish,
-        status: status
-    }
-    return await db.collection("theses").doc(studentEmail + " " + promoterEmail).set(thesis);
+    getUser(studentEmail)
+        .then(students => {
+            students.forEach(student => {
+                let thesis = {
+                    degree: student.get("degree"),
+                    studentFirstName: student.get("firstName"),
+                    studentLastName: student.get("lastName"),
+                    studentEmail: studentEmail,
+                    promoterEmail: promoterEmail,
+                    topicEnglish: topicEnglish,
+                    topicPolish: topicPolish,
+                    status: status
+                }
+                db.collection("theses").doc(studentEmail + " " + promoterEmail).set(thesis);
+            })
+        })
 }
 
 async function reviewThesis(studentEmail, promoterEmail, status) {
