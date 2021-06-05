@@ -19,7 +19,7 @@ block layout-content
                     label(for="promoter" class="sr-only") Promoter
                     select(disabled=thesisDisabled name="promoter" id="promoter" class="form-control")
                         each promoter in promoters
-                            option= promoter.email
+                            option= promoter.title + " " + promoter.firstName + " " + promoter.lastName
                 div.NavButtons
                     input(disabled=thesisDisabled type="submit" value="Submit Thesis")
         div.dummy
