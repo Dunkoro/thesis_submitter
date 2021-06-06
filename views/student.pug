@@ -1,25 +1,11 @@
 extends layout
 
 block layout-content
-
     div.View.UserView
-        h1.Banner Thesis Submission
+        h1.Banner Student
         div.Form
-            div.Title
-                h1 Thesis is
-                h1 !{thesisStatus}
-            form(method='POST' action="/submitThesis")
-                div.Details
-                    label(for="thesisTopicPolish" class="sr-only") Polish Thesis Topic
-                    input(disabled=thesisDisabled value=thesisTopicPolish type="text" name="thesisTopicPolish" id="thesisTopicPolish" class="form-control" placeholder="Polish Thesis Topic" required autofocus)
-                div.Details
-                    label(for="thesisTopicEnglish" class="sr-only") English Thesis Topic
-                    input(disabled=thesisDisabled value=thesisTopicEnglish type="text" name="thesisTopicEnglish" id="thesisTopicEnglish" class="form-control" placeholder="English Thesis Topic" required)
-                div.Details
-                    label(for="promoter" class="sr-only") Promoter
-                    select(disabled=thesisDisabled name="promoter" id="promoter" class="form-control")
-                        each promoter in promoters
-                            option= promoter.title + " " + promoter.firstName + " " + promoter.lastName
+            form(method='POST')
                 div.NavButtons
-                    input(disabled=thesisDisabled type="submit" value="Submit Thesis")
-        div.dummy
+                    input(type="submit" name="update" value="Update your details" formaction="/student/details")
+                    input(type="submit" name="submit" value="Submit your thesis topic" formaction="/student/thesis")
+        div

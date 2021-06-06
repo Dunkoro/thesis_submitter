@@ -57,7 +57,7 @@ a {
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: flex-start;
 
     height: 100%;
@@ -114,7 +114,7 @@ a {
 .NavButtons {
     width: 100%;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
     padding: 20px 10px 10px 10px;
 }
@@ -157,9 +157,10 @@ input[type=submit] {
     border-style: outset;
     border-color: darkred;
     height: 60px;
-    width: 100%;
+    width: 200px;
     font: bold 15px arial, sans-serif;
     text-shadow:none;
+    margin: 10px
 }
 input[type=submit]:disabled {
     align-self: center;
@@ -170,10 +171,10 @@ input[type=submit]:disabled {
     font: bold 15px arial, sans-serif;
     text-shadow:none;
 }
+textarea {
+    max-height: 100%;
+    max-width: 100%;
+}
 input:invalid {
     background-color: #ffdddd;
-}
-.dummy{
-    min-width: 0;
-    min-height: 0;
 }

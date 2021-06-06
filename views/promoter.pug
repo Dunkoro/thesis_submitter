@@ -2,23 +2,17 @@ extends layout
 
 block layout-content
     div.View.UserView
-        h1.Banner Thesis Review
+        h1.Banner Promoter
         div.Form
-            div.Title
-                h1 Accepted Thesis Topics
-            div.Details
-                select(name="acceptedTheses" id="acceptedTheses" class="form-control")
-                    each acceptedThesis in acceptedThesesList
-                        option= acceptedThesis.degree + " | " + acceptedThesis.studentFirstName + " " + acceptedThesis.studentLastName + " | " + acceptedThesis.topicPolish + " | " + acceptedThesis.topicEnglish
-        div.Form
-            div.Title
-                h1 Pending Thesis Topics
-            form(method='POST' action="/reviewThesis")
-                div.Details
-                    select(name="reviewedThesis" id="reviewedThesis" class="form-control")
-                        each pendingThesis in pendingThesesList
-                            option= pendingThesis.degree + " | " + pendingThesis.studentFirstName + " " + pendingThesis.studentLastName + " | " + pendingThesis.topicPolish + " | " + pendingThesis.topicEnglish
+            form(method='POST' action="/promoter/thesisSuggestion")
                 div.NavButtons
-                    input(type="submit" name="accept" value="Accept Thesis Topic")
-                    input(type="submit" name="reject" value="Reject Thesis Topic")
-        div.dummy
+                    input(type="submit" name="accept" value="Suggest a topic")
+        div.Form
+            form(method='POST' action="/promoter/studentThesis")
+                div.Details
+                    select(name="thesesList" id="thesesList" class="form-control")
+                        each thesis in thesesList
+                            option(value=thesis.studentEmail)= thesis.status + " | " + thesis.topicPolish + " | " + thesis.topicEnglish
+                div.NavButtons
+                    input(type="submit" name="accept" value="Load declaration data")
+        div

@@ -1,0 +1,17 @@
+extends layout
+
+block layout-content
+    div.View.UserView
+        h1.Banner Thesis Submission
+        div.Form
+            div.Title
+                h1 Thesis Details
+            form.Details(method='POST' action="/student/thesis")
+                div.Details
+                    label(for="suggestedTopic" class="sr-only") Promoter
+                    select(name="suggestedTopic" id="suggestedTopic" class="form-control")
+                        each topic in suggestedTopics
+                            option= topic.topicPolish + "|" + topic.topicEnglish + "|" + topic.language
+                div.NavButtons
+                    input(type="submit" value="Choose the topic")
+        div.dummy

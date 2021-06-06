@@ -1,5 +1,6 @@
 {
   "projects": {
-    "thesistopicsubmitter": "thesistopicsubmitter"
+    "thesistopicsubmitter": "thesistopicsubmitter",
+    "default": "thesistopicsubmitter"
   }
 }

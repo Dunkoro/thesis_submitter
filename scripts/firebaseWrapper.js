@@ -36,15 +36,21 @@ function getCurrentUser() {
 }
 
 async function getUser(email) {
-    const students = await db.collection("students").where("email", "==", email).get();
-    const promoters = await db.collection("promoters").where("email", "==", email).get();
-    if (students.size === 1 || promoters.size === 1) {
-        if (students.size === 1) {
-            return students;
+    const student = await db.collection("students").doc(email).get();
+    const promoter = await db.collection("promoters").doc(email).get();
+    if (student.exists || promoter.exists) {
+        if (student.exists) {
+            return student;
         } else {
-            return promoters;
+            return promoter;
         }
+    } else {
+        return undefined;
     }
+}
+
+async function updateStudentDetails(email, details) {
+    return await db.collection("students").doc(email).update(details,);
 }
 
 async function getPotentialPromoters() {
@@ -52,50 +58,50 @@ async function getPotentialPromoters() {
 }
 
 async function getThesisByStudentEmail(email) {
-    const theses = await db.collection("theses").where("studentEmail", "==", email).get();
-    if (theses.size === 1) {
-        return theses;
-    }
+    return await db.collection("theses").doc(email).get();
 }
 
 async function getThesesByPromoterEmail(email) {
     return await db.collection("theses").where("promoterEmail", "==", email).get();
 }
 
-async function updateThesis(studentEmail, promoterEmail, topicPolish, topicEnglish, status) {
-    getUser(studentEmail)
-        .then(students => {
-            students.forEach(student => {
-                let thesis = {
-                    degree: student.get("degree"),
-                    studentFirstName: student.get("firstName"),
-                    studentLastName: student.get("lastName"),
-                    studentEmail: studentEmail,
-                    promoterEmail: promoterEmail,
-                    topicEnglish: topicEnglish,
-                    topicPolish: topicPolish,
-                    status: status
-                }
-                db.collection("theses").doc(studentEmail + " " + promoterEmail).set(thesis);
-            })
-        })
+async function getThesisSuggestionsByPromoterEmail(email) {
+    return await db
+        .collection("promoters").doc(email)
+        .collection("suggestedTheses")
+        .get();
 }
 
-async function reviewThesis(studentEmail, promoterEmail, status) {
+async function updateThesis(thesis) {
+    await db.collection("theses").doc(thesis.studentEmail).set(thesis);
+}
+
+async function reviewThesis(studentEmail, status) {
     let thesis = {
         status: status
     };
-    return await db.collection("theses").doc(studentEmail + " " + promoterEmail).update(thesis);
+    return await db.collection("theses").doc(studentEmail).update(thesis);
+}
+
+async function suggestThesis(promoterEmail, thesis) {
+    console.log(promoterEmail, thesis);
+    return await db
+        .collection("promoters").doc(promoterEmail)
+        .collection("suggestedTheses").doc(thesis.topicPolish + "|" + thesis.topicEnglish)
+        .set(thesis);
 }
 
 module.exports = {
     signIn,
     signOut,
-    getUser,
     getCurrentUser,
+    getUser,
+    updateStudentDetails,
     getThesisByStudentEmail,
     getThesesByPromoterEmail,
     getPotentialPromoters,
+    getThesisSuggestionsByPromoterEmail,
     updateThesis,
-    reviewThesis
+    reviewThesis,
+    suggestThesis
 };
