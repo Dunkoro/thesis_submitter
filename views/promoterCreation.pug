@@ -1,0 +1,21 @@
+extends layout
+
+block layout-content
+    div.View.AdminView
+        div.Form
+            div.Title
+                h1 Promoter Details
+            form(method='POST' action="/admin/createPromoter")
+                div.Details
+                    label(for="email" class="sr-only") E-Mail
+                    input(type="email" name="email" id="email" class="form-control" placeholder="E-Mail" required)
+                    label(for="password" class="sr-only") Password
+                    input(type="password" name="password" id="password" class="form-control" placeholder="Password" required)
+                    label(for="title" class="sr-only") Title
+                    input(type="text" name="title" id="title" class="form-control" placeholder="Title" required)
+                    label(for="firstName" class="sr-only") First Name
+                    input(type="text" name="firstName" id="firstName" class="form-control" placeholder="First name" required)
+                    label(for="lastName" class="sr-only") Last Name
+                    input(type="text" name="lastName" id="lastName" class="form-control" placeholder="Last name" required)
+                div.NavButtons
+                    input(type="submit" value="Create Promoter Account")

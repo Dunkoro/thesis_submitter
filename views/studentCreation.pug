@@ -1,0 +1,34 @@
+extends layout
+
+block layout-content
+    div.View.AdminView
+        div.Form
+            div.Title
+                h1 Student Details
+            form(method='POST' action="/admin/createStudent")
+                div.Details
+                    label(for="email" class="sr-only") E-Mail
+                    input(type="email" name="email" id="email" class="form-control" placeholder="E-Mail" required)
+                    label(for="password" class="sr-only") Password
+                    input(type="password" name="password" id="password" class="form-control" placeholder="Password" required)
+                div.Details
+                    label(for="firstName" class="sr-only") First Name
+                    input(type="text" name="firstName" id="firstName" class="form-control" placeholder="First name" required)
+                    label(for="lastName" class="sr-only") Last Name
+                    input(type="text" name="lastName" id="lastName" class="form-control" placeholder="Last name" required)
+                    label(for="index" class="sr-only") Index Number
+                    input(type="text" name="index" id="index" class="form-control" placeholder="Index number" required)
+                    label(for="specialization" class="sr-only") Specialization (or N/A)
+                    input(type="text" name="specialization" id="specialization" class="form-control" placeholder="Specialization" required)
+                    label(for="degreeOfStudy" class="sr-only") Degree of study
+                    select(name="degreeOfStudy" id="degreeOfStudy" class="form-control")
+                        each degree in ["I", "II"]
+                            option= degree
+                    label(for="formOfStudy" class="sr-only") Form of study
+                    select(name="formOfStudy" id="formOfStudy" class="form-control")
+                        each form in ["ST", "NZ"]
+                            option= form
+                    label(for="yearOfStudy" class="sr-only") Year of study
+                    input(min="1" max="10" type="number" oninput="validity.valid||(value='')" name="yearOfStudy" id="yearOfStudy" class="form-control" placeholder="Year of study" required)
+                div.NavButtons
+                    input(type="submit" value="Create Student Account")

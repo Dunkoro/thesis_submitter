@@ -37,6 +37,9 @@ app.get("/", (req, res) => {
 
 app.post("/login", urlencodedParser, (req, res) => {
     firebaseWrapper.signIn(req.body.email, req.body.password).then(signInResponse => {
+        if (signInResponse.user.email === "admin@pwr.edu.pl") {
+            res.redirect("/admin");
+        }
         if (signInResponse && signInResponse.toString() !== "auth/user-not-found" && signInResponse.toString() !== "auth/wrong-password") {
             firebaseWrapper.getUser(req.body.email).then(user => {
                 if (user) {
@@ -54,6 +57,106 @@ app.post("/login", urlencodedParser, (req, res) => {
             res.render("error", {error: "403\nUser Unauthorized"});
         }
     });
+});
+
+app.get("/admin", (req, res) => {
+    if (!firebaseWrapper.getCurrentUser()) {
+        res.redirect("/");
+        return;
+    }
+    res.render("admin");
+});
+app.get("/admin/createStudent", (req, res) => {
+    if (!firebaseWrapper.getCurrentUser()) {
+        res.redirect("/");
+        return;
+    }
+    res.render("studentCreation");
+});
+app.post("/admin/createStudent", urlencodedParser, (req, res) => {
+    if (!firebaseWrapper.getCurrentUser()) {
+        res.redirect("/");
+        return;
+    }
+    firebaseWrapper.createStudent({
+            email: req.body.email,
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            index: req.body.index,
+            specialization: req.body.specialization,
+            degreeOfStudy: req.body.degreeOfStudy,
+            formOfStudy: req.body.formOfStudy,
+            yearOfStudy: req.body.yearOfStudy,
+            archived: false
+        },
+        req.body.password)
+    res.redirect("/admin/createStudent");
+});
+app.get("/admin/createPromoter", (req, res) => {
+    if (!firebaseWrapper.getCurrentUser()) {
+        res.redirect("/");
+        return;
+    }
+    res.render("promoterCreation");
+});
+app.post("/admin/createPromoter", urlencodedParser, (req, res) => {
+    if (!firebaseWrapper.getCurrentUser()) {
+        res.redirect("/");
+        return;
+    }
+    firebaseWrapper.createPromoter({
+            email: req.body.email,
+            title: req.body.title,
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            archived: false
+        },
+        req.body.password)
+    res.redirect("/admin/createPromoter");
+});
+app.get("/admin/archiveStudent", (req, res) => {
+    if (!firebaseWrapper.getCurrentUser()) {
+        res.redirect("/");
+        return;
+    }
+    firebaseWrapper.getAllStudents().then(students => {
+        let studentList = [];
+        students.forEach(student => studentList.push(student.data()));
+        res.render("studentArchiving", {students: studentList});
+    }).catch(error => {
+        console.log(error);
+        res.redirect("/admin");
+    });
+});
+app.post("/admin/archiveStudent", urlencodedParser, (req, res) => {
+    if (!firebaseWrapper.getCurrentUser()) {
+        res.redirect("/");
+        return;
+    }
+    firebaseWrapper.archiveStudent(req.body.studentEmail);
+    res.redirect("/admin/archiveStudent");
+});
+app.get("/admin/archivePromoter", (req, res) => {
+    if (!firebaseWrapper.getCurrentUser()) {
+        res.redirect("/");
+        return;
+    }
+    firebaseWrapper.getAllPromoters().then(promoters => {
+        let promoterList = [];
+        promoters.forEach(promoter => promoterList.push(promoter.data()));
+        res.render("promoterArchiving", {promoters: promoterList});
+    }).catch(error => {
+        console.log(error);
+        res.redirect("/admin");
+    });
+});
+app.post("/admin/archivePromoter", urlencodedParser, (req, res) => {
+    if (!firebaseWrapper.getCurrentUser()) {
+        res.redirect("/");
+        return;
+    }
+    firebaseWrapper.archivePromoter(req.body.promoterEmail);
+    res.redirect("/admin/archivePromoter");
 });
 
 app.get("/student", (req, res) => {

@@ -126,6 +126,10 @@ a {
     background: url("https://live.staticflickr.com/7385/8924365702_2e0a989d35_b.jpg") left bottom;
     background-size: cover;
 }
+.AdminView {
+    background: url("https://upload.wikimedia.org/wikipedia/commons/2/24/Main_Building_of_Faculty_of_Architecture_of_Politechnika_Wroc%C5%82awska_%28Poland%2C_February_2013%29.jpg") left bottom;
+    background-size: cover;
+}
 
 .form {
     width: 100%;

@@ -1,0 +1,14 @@
+extends layout
+
+block layout-content
+    div.View.AdminView
+        h1.Banner Admin Console
+        div.Form
+            form(method='GET')
+                div.NavButtons
+                    input(type="submit" value="New Student Account" formaction="/admin/createStudent")
+                    input(type="submit" value="New Promoter Account" formaction="/admin/createPromoter")
+                div.NavButtons
+                    input(type="submit" value="Archive Student Account" formaction="/admin/archiveStudent")
+                    input(type="submit" value="Archive Promoter Account" formaction="/admin/archivePromoter")
+        div.dummy

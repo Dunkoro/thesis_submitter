@@ -39,14 +39,13 @@ async function getUser(email) {
     const student = await db.collection("students").doc(email).get();
     const promoter = await db.collection("promoters").doc(email).get();
     if (student.exists || promoter.exists) {
-        if (student.exists) {
+        if (student.exists && !student.get("archived")) {
             return student;
-        } else {
+        } else if (!promoter.get("archived")) {
             return promoter;
         }
-    } else {
-        return undefined;
     }
+    return undefined;
 }
 
 async function updateStudentDetails(email, details) {
@@ -91,6 +90,45 @@ async function suggestThesis(promoterEmail, thesis) {
         .set(thesis);
 }
 
+async function getAllStudents() {
+    return await db.collection("students").where("archived", "==", false).get();
+}
+
+async function getAllPromoters() {
+    return await db.collection("promoters").where("archived", "==", false).get();
+}
+
+async function createStudent(student, password) {
+    firebase.auth().createUserWithEmailAndPassword(student.email, password)
+        .then(() => {
+            signIn("admin@pwr.edu.pl", "AdminPassword123");
+            db.collection("students").doc(student.email).set(student);
+        });
+}
+
+async function createPromoter(promoter, password) {
+    firebase.auth().createUserWithEmailAndPassword(promoter.email, password)
+        .then(() => {
+            signIn("admin@pwr.edu.pl", "AdminPassword123");
+            db.collection("promoters").doc(promoter.email).set(promoter);
+        });
+
+}
+
+async function archiveStudent(email) {
+    let archived = {
+        archived: true
+    };
+    return await db.collection("students").doc(email).update(archived);
+}
+
+async function archivePromoter(email) {
+    let archived = {
+        archived: true
+    };
+    return await db.collection("promoters").doc(email).update(archived);
+}
+
 module.exports = {
     signIn,
     signOut,
@@ -103,5 +141,11 @@ module.exports = {
     getThesisSuggestionsByPromoterEmail,
     updateThesis,
     reviewThesis,
-    suggestThesis
+    suggestThesis,
+    getAllStudents,
+    getAllPromoters,
+    createStudent,
+    createPromoter,
+    archiveStudent,
+    archivePromoter
 };
