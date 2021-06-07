@@ -3,6 +3,8 @@ extends layout
 block layout-content
     div.View.UserView
         div.Form
+            div.Title
+                h1 Propose a topic
             form(method='POST' action="/promoter/suggestThesis")
                 div.Details
                     label(for="topicPolish" class="sr-only") Polish Topic
