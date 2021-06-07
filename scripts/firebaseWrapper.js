@@ -49,11 +49,13 @@ async function getUser(email) {
 }
 
 async function updateStudentDetails(email, details) {
-    return await db.collection("students").doc(email).update(details,);
+    return await db.collection("students").doc(email).update(details);
 }
 
 async function getPotentialPromoters() {
-    return await db.collection("promoters").get();
+    return await db.collection("promoters")
+        .where("archived", "==", false)
+        .get();
 }
 
 async function getThesisByStudentEmail(email) {
@@ -61,7 +63,10 @@ async function getThesisByStudentEmail(email) {
 }
 
 async function getThesesByPromoterEmail(email) {
-    return await db.collection("theses").where("promoterEmail", "==", email).get();
+    return await db.collection("theses")
+        .where("promoterEmail", "==", email)
+        .where("archived", "==", false)
+        .get();
 }
 
 async function getThesisSuggestionsByPromoterEmail(email) {
@@ -119,14 +124,15 @@ async function archiveStudent(email) {
     let archived = {
         archived: true
     };
-    return await db.collection("students").doc(email).update(archived);
+    await db.collection("students").doc(email).update(archived);
+    await db.collection("theses").doc(email).update(archived);
 }
 
 async function archivePromoter(email) {
     let archived = {
         archived: true
     };
-    return await db.collection("promoters").doc(email).update(archived);
+    await db.collection("promoters").doc(email).update(archived);
 }
 
 module.exports = {

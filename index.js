@@ -264,7 +264,8 @@ app.post("/student/submitThesis", urlencodedParser, (req, res) => {
             promoterEmail: req.body.promoterEmail,
             goalAndScope: req.body.goalAndScope,
             initialStructure: req.body.initialStructure,
-            status: "PENDING"
+            status: "PENDING",
+            archived: false
         }
     );
 
