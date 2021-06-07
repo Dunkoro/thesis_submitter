@@ -37,7 +37,7 @@ app.get("/", (req, res) => {
 
 app.post("/login", urlencodedParser, (req, res) => {
     firebaseWrapper.signIn(req.body.email, req.body.password).then(signInResponse => {
-        if (signInResponse.user.email === "admin@pwr.edu.pl") {
+        if (signInResponse.user && signInResponse.user.email === "admin@pwr.edu.pl") {
             res.redirect("/admin");
         }
         if (signInResponse && signInResponse.toString() !== "auth/user-not-found" && signInResponse.toString() !== "auth/wrong-password") {
@@ -235,7 +235,6 @@ app.post("/student/thesis", urlencodedParser, (req, res) => {
     if (!req.body.suggestedTopic) {
         res.redirect("/student/thesis");
     } else {
-        let email = firebaseWrapper.getCurrentUser().email;
         firebaseWrapper.getPotentialPromoters().then(promoters => {
             let promoterList = [];
             promoters.forEach(promoter => {
