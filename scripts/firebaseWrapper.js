@@ -15,6 +15,14 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+function getOne(documents) {
+    let document = undefined;
+    if (documents.size === 1) {
+        documents.forEach(doc => document = doc);
+    }
+    return document;
+}
+
 function signIn(email, password) {
     return firebase.auth()
         .signInWithEmailAndPassword(email, password)
@@ -35,11 +43,15 @@ function getCurrentUser() {
     return firebase.auth().currentUser;
 }
 
+async function getAdminList() {
+    return await db.collection("admins").get();
+}
+
 async function getUser(email) {
-    const student = await db.collection("students").doc(email).get();
-    const promoter = await db.collection("promoters").doc(email).get();
-    if (student.exists || promoter.exists) {
-        if (student.exists && !student.get("archived")) {
+    const student = getOne(await db.collection("students").where("email", "==", email).get());
+    const promoter = getOne(await db.collection("promoters").where("email", "==", email).get());
+    if (student || promoter) {
+        if (student && !student.get("archived")) {
             return student;
         } else if (!promoter.get("archived")) {
             return promoter;
@@ -49,7 +61,8 @@ async function getUser(email) {
 }
 
 async function updateStudentDetails(email, details) {
-    return await db.collection("students").doc(email).update(details);
+    let student = getOne(await db.collection("students").where("email", "==", email).get());
+    return student.ref.update(details);
 }
 
 async function getPotentialPromoters() {
@@ -59,11 +72,11 @@ async function getPotentialPromoters() {
 }
 
 async function getThesisByStudentEmail(email) {
-    return await db.collection("theses").doc(email).get();
+    return getOne(await db.collection("suggestions").where("studentEmail", "==", email).get());
 }
 
 async function getThesesByPromoterEmail(email) {
-    return await db.collection("theses")
+    return await db.collection("suggestions")
         .where("promoterEmail", "==", email)
         .where("archived", "==", false)
         .get();
@@ -71,28 +84,49 @@ async function getThesesByPromoterEmail(email) {
 
 async function getThesisSuggestionsByPromoterEmail(email) {
     return await db
-        .collection("promoters").doc(email)
-        .collection("suggestedTheses")
+        .collection("suggestions")
+        .where("promoterEmail", "==", email)
+        .where("studentEmail", "==", "")
         .get();
 }
 
 async function updateThesis(thesis) {
-    await db.collection("theses").doc(thesis.studentEmail).set(thesis);
+    let suggestion = getOne(await db.collection("suggestions").where("studentEmail", "==", thesis.studentEmail).get());
+    if (suggestion) {
+        suggestion.ref.set(thesis);
+    } else {
+        suggestion = getOne(await db.collection("suggestions").where("promoterEmail", "==", thesis.promoterEmail).get());
+        if (suggestion) {
+            suggestion.ref.set(thesis, {merge: true})
+        } else {
+            await db.collection("suggestions").add(thesis);
+        }
+    }
+}
+
+async function declareThesis(studentEmail) {
+    let suggestion = getOne(await db.collection("suggestions").where("studentEmail", "==", studentEmail).get());
+    await db.collection("theses").add(suggestion.data());
+    suggestion.ref.update(
+        {
+            status: "DECLARED",
+            statusDate: new Date()
+        });
 }
 
 async function reviewThesis(studentEmail, status) {
     let thesis = {
-        status: status
+        status: status,
+        statusDate: new Date()
     };
-    return await db.collection("theses").doc(studentEmail).update(thesis);
+    console.log(studentEmail);
+    return getOne(await db.collection("suggestions").where("studentEmail", "==", studentEmail).get())
+        .ref.update(thesis);
+
 }
 
-async function suggestThesis(promoterEmail, thesis) {
-    console.log(promoterEmail, thesis);
-    return await db
-        .collection("promoters").doc(promoterEmail)
-        .collection("suggestedTheses").doc(thesis.topicPolish + "|" + thesis.topicEnglish)
-        .set(thesis);
+async function suggestThesis(thesis) {
+    return await db.collection("suggestions").add(thesis);
 }
 
 async function getAllStudents() {
@@ -107,7 +141,7 @@ async function createStudent(student, password) {
     firebase.auth().createUserWithEmailAndPassword(student.email, password)
         .then(() => {
             signIn("admin@pwr.edu.pl", "AdminPassword123");
-            db.collection("students").doc(student.email).set(student);
+            db.collection("students").add(student);
         });
 }
 
@@ -115,7 +149,7 @@ async function createPromoter(promoter, password) {
     firebase.auth().createUserWithEmailAndPassword(promoter.email, password)
         .then(() => {
             signIn("admin@pwr.edu.pl", "AdminPassword123");
-            db.collection("promoters").doc(promoter.email).set(promoter);
+            db.collection("promoters").add(promoter);
         });
 
 }
@@ -124,21 +158,25 @@ async function archiveStudent(email) {
     let archived = {
         archived: true
     };
-    await db.collection("students").doc(email).update(archived);
-    await db.collection("theses").doc(email).update(archived);
+    await getOne(await db.collection("students").where("email", "==", email).get())
+        .ref.update(archived);
+    await getOne(await db.collection("suggestions").where("studentEmail", "==", email).get())
+        .ref.update(archived);
 }
 
 async function archivePromoter(email) {
     let archived = {
         archived: true
     };
-    await db.collection("promoters").doc(email).update(archived);
+    await getOne(db.collection("promoters").where("email", "==", email).get())
+        .ref.update(archived);
 }
 
 module.exports = {
     signIn,
     signOut,
     getCurrentUser,
+    getAdminList,
     getUser,
     updateStudentDetails,
     getThesisByStudentEmail,
@@ -146,6 +184,7 @@ module.exports = {
     getPotentialPromoters,
     getThesisSuggestionsByPromoterEmail,
     updateThesis,
+    declareThesis,
     reviewThesis,
     suggestThesis,
     getAllStudents,

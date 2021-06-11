@@ -2,7 +2,6 @@ extends layout
 
 block layout-content
     div.View.UserView
-        h1.Banner Update Your Details
         div.Form
             div.Title
                 h1 Student Details
@@ -28,4 +27,3 @@ block layout-content
                     input(value=student.yearOfStudy min="1" max="10" type="number" oninput="validity.valid||(value='')" name="yearOfStudy" id="yearOfStudy" class="form-control" placeholder="Year of study" required)
                 div.NavButtons
                     input(type="submit" value="Update your details")
-        div.dummy
