@@ -67,7 +67,16 @@ app.get("/admin", (req, res) => {
         res.redirect("/");
         return;
     }
-    res.render("admin");
+    firebaseWrapper.getAllTheses().then(theses => {
+        let thesesList = [];
+        theses.forEach(thesis => {
+            thesesList.push(thesis.data());
+        });
+        let options = {
+            theses: thesesList
+        };
+        res.render("admin", options);
+    });
 });
 app.get("/admin/createStudent", (req, res) => {
     if (!firebaseWrapper.getCurrentUser()) {

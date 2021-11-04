@@ -102,6 +102,13 @@ async function suggestThesis(thesis) {
     return await db.collection("theses").add(thesis);
 }
 
+async function getAllTheses() {
+    return await db
+        .collection("theses")
+        .orderBy("promoterEmail")
+        .get();
+}
+
 async function getAllSuggestedTheses() {
     return await db
         .collection("theses")
@@ -162,6 +169,7 @@ module.exports = {
     getCurrentUser,
     getAdminList,
     getUser,
+    getAllTheses,
     getAllSuggestedTheses,
     getThesisByTopicPolish,
     getThesisByStudentEmail,

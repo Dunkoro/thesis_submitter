@@ -2,11 +2,35 @@ extends layout
 
 block layout-content
     div.View.AdminView
-        div.Form
-            form(method='GET')
-                div.NavButtons
-                    input(type="submit" value="New Student Account" formaction="/admin/createStudent")
-                    input(type="submit" value="New Promoter Account" formaction="/admin/createPromoter")
-                div.NavButtons
-                    input(type="submit" value="Archive Student Account" formaction="/admin/archiveStudent")
-                    input(type="submit" value="Archive Promoter Account" formaction="/admin/archivePromoter")
+        table
+            tr
+                td
+                    div.Form
+                        form(method='GET')
+                            div.NavButtons
+                                input(type="submit" value="New Student Account" formaction="/admin/createStudent")
+                                input(type="submit" value="New Promoter Account" formaction="/admin/createPromoter")
+                            div.NavButtons
+                                input(type="submit" value="Archive Student Account" formaction="/admin/archiveStudent")
+                                input(type="submit" value="Archive Promoter Account" formaction="/admin/archivePromoter")
+                td
+                    div.Form
+                        form.Details
+                            table(style = 'width:100%' border = '1')
+                                thead
+                                    tr
+                                        th= "Status"
+                                        th= "Student Email"
+                                        th= "Promoter Email"
+                                        th= "Polish Topic"
+                                        th= "English Topic"
+                                        th= "Language"
+                                tbody
+                                    for thesis in theses
+                                        tr
+                                            td= thesis.status
+                                            td= thesis.studentEmail
+                                            th= thesis.promoterEmail
+                                            td= thesis.topicPolish
+                                            td= thesis.topicEnglish
+                                            td= thesis.language
