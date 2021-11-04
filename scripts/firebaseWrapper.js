@@ -48,47 +48,45 @@ async function getUser(email) {
     return undefined;
 }
 
-async function updateStudentDetails(email, details) {
-    return await db.collection("students").doc(email).update(details);
-}
-
-async function getPotentialPromoters() {
-    return await db.collection("promoters")
-        .where("archived", "==", false)
+async function getAllTheses() {
+    return await db
+        .collection("theses")
+        .orderBy("promoterEmail", "asc")
         .get();
 }
 
 async function getThesisByStudentEmail(email) {
-    return await db.collection("theses").doc(email).get();
+    return await db
+        .collection("theses")
+        .doc(email)
+        .get();
 }
 
 async function getThesesByPromoterEmail(email) {
-    return await db.collection("theses")
+    return await db
+        .collection("theses")
         .where("promoterEmail", "==", email)
         .where("archived", "==", false)
         .get();
 }
 
-async function getThesisSuggestionsByPromoterEmail(email) {
-    return await db
-        .collection("promoters").doc(email)
-        .collection("suggestedTheses")
-        .get();
-}
-
 async function updateThesis(thesis) {
-    await db.collection("theses").doc(thesis.studentEmail).set(thesis);
+    await db
+        .collection("theses")
+        .doc(thesis.studentEmail)
+        .set(thesis);
 }
 
 async function reviewThesis(studentEmail, status) {
     let thesis = {
         status: status
     };
-    return await db.collection("theses").doc(studentEmail).update(thesis);
+    return await db.collection("theses")
+        .doc(studentEmail)
+        .update(thesis);
 }
 
 async function suggestThesis(promoterEmail, thesis) {
-    console.log(promoterEmail, thesis);
     return await db
         .collection("promoters").doc(promoterEmail)
         .collection("suggestedTheses").doc(thesis.topicPolish + "|" + thesis.topicEnglish)
@@ -96,11 +94,15 @@ async function suggestThesis(promoterEmail, thesis) {
 }
 
 async function getAllStudents() {
-    return await db.collection("students").where("archived", "==", false).get();
+    return await db
+        .collection("students")
+        .where("archived", "==", false).get();
 }
 
 async function getAllPromoters() {
-    return await db.collection("promoters").where("archived", "==", false).get();
+    return await db.collection("promoters")
+        .where("archived", "==", false)
+        .get();
 }
 
 async function createStudent(student, password) {
@@ -124,15 +126,24 @@ async function archiveStudent(email) {
     let archived = {
         archived: true
     };
-    await db.collection("students").doc(email).update(archived);
-    await db.collection("theses").doc(email).update(archived);
+    await db
+        .collection("students")
+        .doc(email)
+        .update(archived);
+    await db
+        .collection("theses")
+        .doc(email)
+        .update(archived);
 }
 
 async function archivePromoter(email) {
     let archived = {
         archived: true
     };
-    await db.collection("promoters").doc(email).update(archived);
+    await db
+        .collection("promoters")
+        .doc(email)
+        .update(archived);
 }
 
 module.exports = {
@@ -140,11 +151,9 @@ module.exports = {
     signOut,
     getCurrentUser,
     getUser,
-    updateStudentDetails,
+    getAllTheses,
     getThesisByStudentEmail,
     getThesesByPromoterEmail,
-    getPotentialPromoters,
-    getThesisSuggestionsByPromoterEmail,
     updateThesis,
     reviewThesis,
     suggestThesis,
