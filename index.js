@@ -37,21 +37,25 @@ app.get("/", (req, res) => {
 
 app.post("/login", urlencodedParser, (req, res) => {
     firebaseWrapper.signIn(req.body.email, req.body.password).then(signInResponse => {
-        if (signInResponse.user && signInResponse.user.email === "admin@pwr.edu.pl") {
-            res.redirect("/admin");
-        }
-        if (signInResponse && signInResponse.code !== "auth/user-not-found" && signInResponse.code !== "auth/wrong-password") {
-            firebaseWrapper.getUser(req.body.email).then(user => {
-                if (user) {
-                    if (user.get("index")) {
-                        res.redirect("/student");
-                    } else {
-                        res.redirect("/promoter");
+        if (signInResponse && signInResponse.toString() !== "auth/user-not-found" && signInResponse.toString() !== "auth/wrong-password") {
+            firebaseWrapper.getAdminList().then(admins => {
+                admins.forEach(admin => {
+                    if (admin.get("email") === req.body.email) {
+                        res.redirect("/admin");
                     }
-                } else {
-                    res.render("error", {error: "403\nUser Unauthorized"});
-                }
-            }).catch((error) => res.render("error", {error: error}));
+                });
+                firebaseWrapper.getUser(req.body.email).then(user => {
+                    if (user) {
+                        if (user.get("index")) {
+                            res.redirect("/student");
+                        } else {
+                            res.redirect("/promoter");
+                        }
+                    } else {
+                        res.render("error", {error: "403\nUser Unauthorized"});
+                    }
+                }).catch((error) => res.render("error", {error: error}));
+            })
         } else {
             res.render("error", {error: "403\nUser Unauthorized"});
         }
@@ -183,11 +187,12 @@ app.get("/student/thesis", (req, res) => {
             let options = {
                 theses: thesisList
             };
-            if (thesis.exists) {
+            if (thesis) {
                 options.thesis = thesis.data();
             } else {
                 options.thesis = {
-                    status: "NOT YET SUBMITTED"
+                    status: "NOT YET SUBMITTED",
+                    statusDate: new Date()
                 };
             }
             res.render("thesisDetails", options);
@@ -207,6 +212,7 @@ app.post("/student/thesis", urlencodedParser, (req, res) => {
                 promoters: promoterList,
                 thesis: {
                     status: "NOT YET SUBMITTED",
+                    statusDate: new Date(),
                     topicPolish: req.body.suggestedTopic.split("|")[0],
                     topicEnglish: req.body.suggestedTopic.split("|")[1],
                     language: req.body.suggestedTopic.split("|")[2]
@@ -216,7 +222,7 @@ app.post("/student/thesis", urlencodedParser, (req, res) => {
         });
     }
 });
-app.post("/student/submitThesis", urlencodedParser, (req, res) => {
+app.post("/student/suggestThesis", urlencodedParser, (req, res) => {
     firebaseWrapper.updateThesis(
         {
             topicPolish: req.body.topicPolish,
@@ -227,9 +233,15 @@ app.post("/student/submitThesis", urlencodedParser, (req, res) => {
             goalAndScope: req.body.goalAndScope,
             initialStructure: req.body.initialStructure,
             status: "PENDING",
+            statusDate: new Date(),
             archived: false
         }
     );
+
+    res.redirect("/student/thesis");
+});
+app.post("/student/submitThesis", urlencodedParser, (req, res) => {
+    firebaseWrapper.declareThesis(firebaseWrapper.getCurrentUser().email);
 
     res.redirect("/student/thesis");
 });
@@ -325,10 +337,12 @@ app.post("/promoter/suggestThesis", urlencodedParser, (req, res) => {
     let thesis = {
         topicPolish: req.body.topicPolish,
         topicEnglish: req.body.topicEnglish,
-        language: req.body.language
-    };
+        language: req.body.language,
+        promoterEmail: promoterEmail,
+        studentEmail: ""
+    }
 
-    firebaseWrapper.suggestThesis(promoterEmail, thesis);
+    firebaseWrapper.suggestThesis(thesis);
 
     res.redirect("/promoter/thesisSuggestion");
 });

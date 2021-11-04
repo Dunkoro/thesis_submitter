@@ -2,10 +2,9 @@ extends layout
 
 block layout-content
     div.View.UserView
-        h1.Banner Thesis Submission
         div.Form
             div.Title
-                h1 Proposed Topic
+                h1 Suggested Topics
             form.Details(method='POST' action="/student/thesis")
                 div.Details
                     label(for="suggestedTopic" class="sr-only")
@@ -14,4 +13,3 @@ block layout-content
                             option= topic.topicPolish + "|" + topic.topicEnglish + "|" + topic.language
                 div.NavButtons
                     input(type="submit" value="Choose the topic")
-        div.dummy
