@@ -2,8 +2,63 @@ extends layout
 
 block layout-content
     div.View.UserView
-        div.Form
-            form(method='POST')
-                div.NavButtons
-                    input(type="submit" name="submit" value="Submit your thesis topic" formaction="/student/thesis")
-        div
+        h1.Banner Thesis Submission
+        table
+            tr
+                td
+                    div.Form
+                        div.Title
+                            h1 Your Topic
+                        form.Details(method='POST' action="/student/submitThesis")
+                            div.Details
+                                label(for="status" class="sr-only") Status
+                                input(disabled=true value=thesis.status type="text" name="status" id="status" class="form-control" placeholder="NOT YET SUBMITTED")
+                                label(for="topicPolish" class="sr-only") Polish Topic
+                                input(disabled=disabled value=thesis.topicPolish type="text" name="topicPolish" id="topicPolish" class="form-control" placeholder="Polish Topic" required autofocus)
+                                label(for="topicEnglish" class="sr-only") English Topic
+                                input(disabled=disabled value=thesis.topicEnglish type="text" name="topicEnglish" id="topicEnglish" class="form-control" placeholder="English Topic" required)
+                                label(for="language" class="sr-only") Language
+                                select(disabled=disabled name="language" id="language" class="form-control")
+                                    each language in ["polish", "english"]
+                                        option= language
+                                label(for="promoterEmail" class="sr-only") Promoter
+                                select(disabled=disabled name="promoterEmail" id="promoterEmail" class="form-control")
+                                    each promoter in promoters
+                                        option(label=promoter.title + " " + promoter.firstName + " " + promoter.lastName selected=(promoter.email === thesis.promoterEmail))= promoter.email
+                            div.Details
+                                label(for="goalAndScope" class="sr-only") Goal and scope
+                                textarea(disabled=disabled name="goalAndScope" rows="5" id="goalAndScope" class="form-control" placeholder="Goal and scope" required) #{thesis.goalAndScope}
+                                label(for="initialStructure" class="sr-only") Initial Structure
+                                textarea(disabled=disabled name="initialStructure" rows="5" id="initialStructure" class="form-control" placeholder="Initial Structure" required) #{thesis.initialStructure}
+                            div.NavButtons
+                                input(hidden=disabled type="submit" value="Submit Thesis")
+                td
+                    div.Form
+                        div.Title
+                            h1 Suggested Topics
+                        form.Details(method='POST' action="/student/acceptThesis")
+                            table(style = 'width:100%' border = '1')
+                                thead
+                                    tr
+                                        th= "Option"
+                                        th= "Polish Topic"
+                                        th= "English Topic"
+                                        th= "Language"
+                                        th= "Promoter Email"
+                                tbody
+                                    for thesis in theses
+                                        if !thesis.studentEmail
+                                            tr.OPEN
+                                                td
+                                                    a.Link(href="/student/selectThesis?topicPolish="+thesis.topicPolish) SELECT
+                                                td= thesis.topicPolish
+                                                td= thesis.topicEnglish
+                                                td= thesis.language
+                                                td= thesis.promoterEmail
+                                        else
+                                            tr.UNAVAILABLE
+                                                td UNAVAILABLE
+                                                td= thesis.topicPolish
+                                                td= thesis.topicEnglish
+                                                td= thesis.language
+                                                td= thesis.promoterEmail

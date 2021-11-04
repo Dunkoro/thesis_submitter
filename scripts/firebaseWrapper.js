@@ -60,47 +60,33 @@ async function getUser(email) {
     return undefined;
 }
 
+async function getThesisByTopicPolish(topic) {
+    return getOne(await db.collection("theses").where("topicPolish", "==", topic).get());
+}
+
 async function getThesisByStudentEmail(email) {
-    return getOne(await db.collection("suggestions").where("studentEmail", "==", email).get());
+    return getOne(await db.collection("theses").where("studentEmail", "==", email).get());
 }
 
 async function getThesesByPromoterEmail(email) {
-    return await db.collection("suggestions")
+    return await db.collection("theses")
         .where("promoterEmail", "==", email)
         .where("archived", "==", false)
         .get();
 }
 
-async function getThesisSuggestionsByPromoterEmail(email) {
-    return await db
-        .collection("suggestions")
-        .where("promoterEmail", "==", email)
-        .where("studentEmail", "==", "")
-        .get();
-}
-
 async function updateThesis(thesis) {
-    let suggestion = getOne(await db.collection("suggestions").where("studentEmail", "==", thesis.studentEmail).get());
+    let suggestion = getOne(await db.collection("theses").where("studentEmail", "==", thesis.studentEmail).get());
     if (suggestion) {
         suggestion.ref.set(thesis);
     } else {
-        suggestion = getOne(await db.collection("suggestions").where("promoterEmail", "==", thesis.promoterEmail).get());
+        suggestion = getOne(await db.collection("theses").where("topicPolish", "==", thesis.topicPolish).get());
         if (suggestion) {
             suggestion.ref.set(thesis, {merge: true})
         } else {
-            await db.collection("suggestions").add(thesis);
+            await db.collection("theses").add(thesis);
         }
     }
-}
-
-async function declareThesis(studentEmail) {
-    let suggestion = getOne(await db.collection("suggestions").where("studentEmail", "==", studentEmail).get());
-    await db.collection("theses").add(suggestion.data());
-    suggestion.ref.update(
-        {
-            status: "DECLARED",
-            statusDate: new Date()
-        });
 }
 
 async function reviewThesis(studentEmail, status) {
@@ -108,19 +94,18 @@ async function reviewThesis(studentEmail, status) {
         status: status,
         statusDate: new Date()
     };
-    console.log(studentEmail);
-    return getOne(await db.collection("suggestions").where("studentEmail", "==", studentEmail).get())
+    return getOne(await db.collection("theses").where("studentEmail", "==", studentEmail).get())
         .ref.update(thesis);
-
 }
 
 async function suggestThesis(thesis) {
-    return await db.collection("suggestions").add(thesis);
+    return await db.collection("theses").add(thesis);
 }
 
-async function getAllTheses() {
+async function getAllSuggestedTheses() {
     return await db
         .collection("theses")
+        .where("suggested", "==", true)
         .get();
 }
 
@@ -132,7 +117,7 @@ async function getAllStudents() {
 
 async function getAllPromoters() {
     return await db.collection("promoters")
-        .where("archived", "==", false)
+        .orderBy("lastName", "asc")
         .get();
 }
 
@@ -159,7 +144,7 @@ async function archiveStudent(email) {
     };
     await getOne(await db.collection("students").where("email", "==", email).get())
         .ref.update(archived);
-    await getOne(await db.collection("suggestions").where("studentEmail", "==", email).get())
+    await getOne(await db.collection("theses").where("studentEmail", "==", email).get())
         .ref.update(archived);
 }
 
@@ -177,11 +162,11 @@ module.exports = {
     getCurrentUser,
     getAdminList,
     getUser,
-    getAllTheses,
+    getAllSuggestedTheses,
+    getThesisByTopicPolish,
     getThesisByStudentEmail,
     getThesesByPromoterEmail,
     updateThesis,
-    declareThesis,
     reviewThesis,
     suggestThesis,
     getAllStudents,

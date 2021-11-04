@@ -162,30 +162,28 @@ app.post("/admin/archivePromoter", urlencodedParser, (req, res) => {
     res.redirect("/admin/archivePromoter");
 });
 
-app.get("/student", (req, res) => {
-    if (!firebaseWrapper.getCurrentUser()) {
-        res.redirect("/");
-        return;
-    }
-    let email = firebaseWrapper.getCurrentUser().email;
-    res.render("student", {email: email});
-});
-
-app.get("/student/thesis", (req, res) => {
-    if (!firebaseWrapper.getCurrentUser()) {
-        res.redirect("/");
-        return;
-    }
-    let email = firebaseWrapper.getCurrentUser().email;
-    firebaseWrapper.getThesisByStudentEmail(email).then(thesis => {
-        firebaseWrapper.getAllTheses().then(theses => {
+function loadStudentWithThesis(res, thesis) {
+    firebaseWrapper.getAllSuggestedTheses().then(theses => {
+        firebaseWrapper.getAllPromoters().then(promoters => {
             let thesisList = [];
             theses.forEach(ths => {
-                thesisList.push(ths.data())
+                thesisList.push(ths.data());
             });
-            thesisList = thesisList.sort((a, b) => a.status === "OPEN" ? -1 : 1);
+            thesisList = thesisList.sort((a, b) =>
+                !a.studentEmail
+                    ? !b.studentEmail
+                        ? a.promoterEmail < b.promoterEmail ? -1 : 1
+                        : -1
+                    : !b.studentEmail
+                        ? 1
+                        : a.promoterEmail < b.promoterEmail ? -1 : 1);
+            let promotersList = [];
+            promoters.forEach(promoter => {
+                promotersList.push(promoter.data());
+            });
             let options = {
-                theses: thesisList
+                theses: thesisList,
+                promoters: promotersList
             };
             if (thesis) {
                 options.thesis = thesis.data();
@@ -195,72 +193,48 @@ app.get("/student/thesis", (req, res) => {
                     statusDate: new Date()
                 };
             }
-            res.render("thesisDetails", options);
+            res.render("student", options);
         });
     });
-});
-app.post("/student/thesis", urlencodedParser, (req, res) => {
-    if (!req.body.suggestedTopic) {
-        res.redirect("/student/thesis");
-    } else {
-        firebaseWrapper.getAllPromoters().then(promoters => {
-            let promoterList = [];
-            promoters.forEach(promoter => {
-                promoterList.push(promoter.data());
-            });
-            let options = {
-                promoters: promoterList,
-                thesis: {
-                    status: "NOT YET SUBMITTED",
-                    statusDate: new Date(),
-                    topicPolish: req.body.suggestedTopic.split("|")[0],
-                    topicEnglish: req.body.suggestedTopic.split("|")[1],
-                    language: req.body.suggestedTopic.split("|")[2]
-                }
-            };
-            res.render("thesisDetails", options);
-        });
-    }
-});
-app.post("/student/suggestThesis", urlencodedParser, (req, res) => {
-    firebaseWrapper.updateThesis(
-        {
-            topicPolish: req.body.topicPolish,
-            topicEnglish: req.body.topicEnglish,
-            language: req.body.language,
-            studentEmail: firebaseWrapper.getCurrentUser().email,
-            promoterEmail: req.body.promoterEmail,
-            goalAndScope: req.body.goalAndScope,
-            initialStructure: req.body.initialStructure,
-            status: "PENDING",
-            statusDate: new Date(),
-            archived: false
-        }
-    );
-
-    res.redirect("/student/thesis");
-});
-app.post("/student/submitThesis", urlencodedParser, (req, res) => {
-    firebaseWrapper.declareThesis(firebaseWrapper.getCurrentUser().email);
-
-    res.redirect("/student/thesis");
-});
-
-app.post("/student/suggestedTopics", urlencodedParser, (req, res) => {
+}
+app.get("/student", (req, res) => {
     if (!firebaseWrapper.getCurrentUser()) {
         res.redirect("/");
         return;
     }
-    let email = req.body.promoterEmail;
-    firebaseWrapper.getThesesByPromoterEmail(email)
-        .then(theses => {
-            let suggestedTopics = [];
-            theses.forEach(thesis => {
-                suggestedTopics.push(thesis.data());
-            });
+    let email = firebaseWrapper.getCurrentUser().email;
+    firebaseWrapper.getThesisByStudentEmail(email).then(thesis => {
+        loadStudentWithThesis(res, thesis);
+    });
+});
+app.get("/student/selectThesis", (req, res) => {
+    if (!firebaseWrapper.getCurrentUser()) {
+        res.redirect("/");
+        return;
+    }
+    if (!req.query.topicPolish) {
+        res.redirect("/student");
+        return;
+    }
+    firebaseWrapper.getThesisByTopicPolish(req.query.topicPolish).then(thesis => {
+        loadStudentWithThesis(res, thesis);
+    });
+});
+app.post("/student/submitThesis", urlencodedParser, (req, res) => {
+    let thesis = {
+        topicPolish: req.body.topicPolish,
+        topicEnglish: req.body.topicEnglish,
+        language: req.body.language,
+        studentEmail: firebaseWrapper.getCurrentUser().email,
+        promoterEmail: req.body.promoterEmail,
+        goalAndScope: req.body.goalAndScope,
+        initialStructure: req.body.initialStructure,
+        status: "PENDING",
+        statusDate: new Date(),
+        archived: false
+    };
 
-            res.render("suggestedTopics", {email: email, suggestedTopics: suggestedTopics});
-        });
+    firebaseWrapper.updateThesis(thesis).then(a => res.redirect("/student"));
 });
 
 app.get("/promoter", (req, res) => {
@@ -278,7 +252,7 @@ app.get("/promoter", (req, res) => {
         theses.forEach(thesis => {
             thesesList.push(thesis.data());
         });
-        options.thesesList = thesesList;
+        options.theses = thesesList;
         res.render("promoter", options);
 
     }).catch(error => {
@@ -286,34 +260,29 @@ app.get("/promoter", (req, res) => {
         res.redirect("/");
     });
 });
-
-app.post("/promoter/studentThesis", urlencodedParser, (req, res) => {
-    let studentEmail = req.body.thesesList;
+app.get("/promoter/acceptThesis", (req, res) => {
     if (!firebaseWrapper.getCurrentUser()) {
         res.redirect("/");
         return;
-    } else if (!studentEmail) {
+    }
+    if (req.query.studentEmail) {
+        firebaseWrapper.reviewThesis(req.query.studentEmail, "ACCEPTED").then(result =>
+            res.redirect("/promoter"));
+    } else {
         res.redirect("/promoter");
     }
-    let options = {};
-    firebaseWrapper.getThesisByStudentEmail(studentEmail).then(thesis => {
-        options.thesis = thesis.data();
-        options.reviewHidden = thesis.get("status") !== "PENDING";
-        firebaseWrapper.getUser(studentEmail).then(student => {
-            options.student = student.data();
-            res.render("studentThesisDetails", options);
-        })
-    })
 });
-app.post("/promoter/acceptThesis", urlencodedParser, (req, res) => {
-    firebaseWrapper.reviewThesis(req.body.email, "ACCEPTED");
-
-    res.redirect("/promoter");
-});
-app.post("/promoter/rejectThesis", urlencodedParser, (req, res) => {
-    firebaseWrapper.reviewThesis(req.body.email, "REJECTED");
-
-    res.redirect("/promoter");
+app.get("/promoter/rejectThesis", (req, res) => {
+    if (!firebaseWrapper.getCurrentUser()) {
+        res.redirect("/");
+        return;
+    }
+    if (req.query.studentEmail) {
+        firebaseWrapper.reviewThesis(req.query.studentEmail, "REJECTED").then(result =>
+            res.redirect("/promoter"));
+    } else {
+        res.redirect("/promoter");
+    }
 });
 
 app.get("/promoter/thesisSuggestion", (req, res) => {
@@ -335,12 +304,15 @@ app.post("/promoter/suggestThesis", urlencodedParser, (req, res) => {
 
     let promoterEmail = firebaseWrapper.getCurrentUser().email;
     let thesis = {
+        status: "AVAILABLE",
+        statusDate: new Date(),
         topicPolish: req.body.topicPolish,
         topicEnglish: req.body.topicEnglish,
         language: req.body.language,
         promoterEmail: promoterEmail,
-        studentEmail: ""
-    }
+        studentEmail: "",
+        suggested: true
+    };
 
     firebaseWrapper.suggestThesis(thesis);
 

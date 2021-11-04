@@ -43,7 +43,7 @@ h1 {
     font-size: 40px;
 }
 a {
-    color: inherit;
+    color: blue;
     text-decoration: none;
     cursor: pointer;
     user-select: none;
@@ -101,7 +101,7 @@ a {
     width: 100%;
 
     background: white;
-    padding: 30px;
+    padding: 25px;
     border-bottom: var(--ui-shadow-border);
     box-shadow: var(--ui-shadow);
 }
@@ -116,7 +116,7 @@ a {
     flex-direction: column;
     line-height: 1.5em;
 
-    width: 100%;
+    width: 90%;
 }
 .NavButtons {
     width: 100%;
