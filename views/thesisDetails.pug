@@ -43,7 +43,7 @@ block layout-content
                             tbody
                                 for thesis in theses
                                     if thesis.status === "OPEN"
-                                        tr.OPEN
+                                        tr.OPEN(onclick="window.location='#';")
                                             td= "OPEN"
                                             td= thesis.topicPolish
                                             td= thesis.topicEnglish

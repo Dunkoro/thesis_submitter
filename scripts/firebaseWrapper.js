@@ -60,17 +60,6 @@ async function getUser(email) {
     return undefined;
 }
 
-async function updateStudentDetails(email, details) {
-    let student = getOne(await db.collection("students").where("email", "==", email).get());
-    return student.ref.update(details);
-}
-
-async function getPotentialPromoters() {
-    return await db.collection("promoters")
-        .where("archived", "==", false)
-        .get();
-}
-
 async function getThesisByStudentEmail(email) {
     return getOne(await db.collection("suggestions").where("studentEmail", "==", email).get());
 }
@@ -127,6 +116,12 @@ async function reviewThesis(studentEmail, status) {
 
 async function suggestThesis(thesis) {
     return await db.collection("suggestions").add(thesis);
+}
+
+async function getAllTheses() {
+    return await db
+        .collection("theses")
+        .get();
 }
 
 async function getAllStudents() {
