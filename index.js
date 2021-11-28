@@ -61,6 +61,9 @@ app.post("/login", urlencodedParser, (req, res) => {
         }
     });
 });
+app.get("/privacyPolicy", urlencodedParser, (req, res) => {
+    res.render("privacyPolicy");
+});
 
 app.get("/admin", (req, res) => {
     if (!firebaseWrapper.getCurrentUser()) {
@@ -68,14 +71,33 @@ app.get("/admin", (req, res) => {
         return;
     }
     firebaseWrapper.getAllTheses().then(theses => {
-        let thesesList = [];
-        theses.forEach(thesis => {
-            thesesList.push(thesis.data());
+        firebaseWrapper.getAllStudents().then(students => {
+            let thesesList = [];
+            let notSubmitted = 0;
+            let pendingApproval = 0;
+            let accepted = 0;
+            theses.forEach(thesis => {
+                thesesList.push(thesis.data());
+            });
+            thesesList.sort((a, b) => a.status < b.status ? -1 : 1);
+            students.forEach(student => {
+                let studentThesis = thesesList.find(th => th.studentEmail === student.get("email"));
+                if (!studentThesis) {
+                    notSubmitted++;
+                } else if (studentThesis.status === "PENDING") {
+                    pendingApproval++;
+                } else if (studentThesis.status === "ACCEPTED") {
+                    accepted++;
+                }
+            });
+            let options = {
+                theses: thesesList,
+                notSubmitted: notSubmitted,
+                pendingApproval: pendingApproval,
+                accepted: accepted
+            };
+            res.render("admin", options);
         });
-        let options = {
-            theses: thesesList
-        };
-        res.render("admin", options);
     });
 });
 app.get("/admin/createStudent", (req, res) => {

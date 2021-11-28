@@ -19,6 +19,20 @@ block layout-content
                             table(style = 'width:100%' border = '1')
                                 thead
                                     tr
+                                        th= "Category of students"
+                                        th= "Count"
+                                    tr
+                                        td= "Students without a thesis declaration"
+                                        td= notSubmitted
+                                    tr
+                                        td= "Students with a thesis declaration pending approval"
+                                        td= pendingApproval
+                                    tr
+                                        td= "Students with an accepted thesis declaration"
+                                        td= accepted
+                            table(style = 'width:100%' border = '1')
+                                thead
+                                    tr
                                         th= "Status"
                                         th= "Student Email"
                                         th= "Promoter Email"
