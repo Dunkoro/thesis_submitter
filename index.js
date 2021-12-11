@@ -193,38 +193,45 @@ app.post("/admin/archivePromoter", urlencodedParser, (req, res) => {
     res.redirect("/admin/archivePromoter");
 });
 
-function loadStudentWithThesis(res, thesis) {
+function loadStudentWithThesis(res, email, thesis) {
     firebaseWrapper.getAllSuggestedTheses().then(theses => {
         firebaseWrapper.getAllPromoters().then(promoters => {
-            let thesisList = [];
-            theses.forEach(ths => {
-                thesisList.push(ths.data());
-            });
-            thesisList = thesisList.sort((a, b) =>
-                !a.studentEmail
-                    ? !b.studentEmail
+            firebaseWrapper.getUser(email).then(student => {
+                let thesisList = [];
+                theses.forEach(ths => {
+                    thesisList.push(ths.data());
+                });
+                thesisList = thesisList.sort((a, b) =>
+                    !a.studentEmail
+                        ? !b.studentEmail
                         ? a.promoterEmail < b.promoterEmail ? -1 : 1
                         : -1
-                    : !b.studentEmail
+                        : !b.studentEmail
                         ? 1
                         : a.promoterEmail < b.promoterEmail ? -1 : 1);
-            let promotersList = [];
-            promoters.forEach(promoter => {
-                promotersList.push(promoter.data());
-            });
-            let options = {
-                theses: thesisList,
-                promoters: promotersList
-            };
-            if (thesis) {
-                options.thesis = thesis.data();
-            } else {
-                options.thesis = {
-                    status: "NOT YET SUBMITTED",
-                    statusDate: new Date()
+                let promotersList = [];
+                promoters.forEach(promoter => {
+                    promotersList.push(promoter.data());
+                });
+
+                let options = {
+                    student: {
+                        firstName: student.get("firstName"),
+                        lastName: student.get("lastName")
+                    },
+                    theses: thesisList,
+                    promoters: promotersList
                 };
-            }
-            res.render("student", options);
+                if (thesis) {
+                    options.thesis = thesis.data();
+                } else {
+                    options.thesis = {
+                        status: "NOT YET SUBMITTED",
+                        statusDate: new Date()
+                    };
+                }
+                res.render("student", options);
+            });
         });
     });
 }
@@ -235,7 +242,7 @@ app.get("/student", (req, res) => {
     }
     let email = firebaseWrapper.getCurrentUser().email;
     firebaseWrapper.getThesisByStudentEmail(email).then(thesis => {
-        loadStudentWithThesis(res, thesis);
+        loadStudentWithThesis(res, email, thesis);
     });
 });
 app.get("/student/selectThesis", (req, res) => {
@@ -247,8 +254,9 @@ app.get("/student/selectThesis", (req, res) => {
         res.redirect("/student");
         return;
     }
+    let email = firebaseWrapper.getCurrentUser().email;
     firebaseWrapper.getThesisByTopicPolish(req.query.topicPolish).then(thesis => {
-        loadStudentWithThesis(res, thesis);
+        loadStudentWithThesis(res, email, thesis);
     });
 });
 app.post("/student/submitThesis", urlencodedParser, (req, res) => {
@@ -274,21 +282,28 @@ app.get("/promoter", (req, res) => {
         return;
     }
     let promoterEmail = firebaseWrapper.getCurrentUser().email;
-    let options = {
-        student: {},
-        thesis: {}
-    };
-    let thesesList = [];
-    firebaseWrapper.getThesesByPromoterEmail(promoterEmail).then(theses => {
-        theses.forEach(thesis => {
-            thesesList.push(thesis.data());
-        });
-        options.theses = thesesList;
-        res.render("promoter", options);
+    firebaseWrapper.getUser(promoterEmail).then(promoter => {
+        firebaseWrapper.getThesesByPromoterEmail(promoterEmail).then(theses => {
+            let options = {
+                promoter: {
+                    title: promoter.get("title"),
+                    firstName: promoter.get("firstName"),
+                    lastName: promoter.get("lastName")
+                },
+                student: {},
+                thesis: {}
+            };
+            let thesesList = [];
 
-    }).catch(error => {
-        console.log(error);
-        res.redirect("/");
+                theses.forEach(thesis => {
+                    thesesList.push(thesis.data());
+                });
+                options.theses = thesesList;
+                res.render("promoter", options);
+            }).catch(error => {
+                console.log(error);
+                res.redirect("/");
+            });
     });
 });
 app.get("/promoter/acceptThesis", (req, res) => {
