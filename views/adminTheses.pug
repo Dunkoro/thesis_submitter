@@ -1,0 +1,27 @@
+extends layout
+
+block layout-content
+    div.View.AdminView
+        h1.Banner Administrative Tools
+        div.Table
+            form.Details
+                table(style = 'width:100%' border = '1')
+                    thead
+                        tr
+                            th= "Status"
+                            th= "Student Email"
+                            th= "Promoter Email"
+                            th= "Polish Topic"
+                            th= "English Topic"
+                            th= "Language"
+                    tbody
+                        for thesis in theses
+                            tr
+                                td= thesis.status
+                                td= thesis.studentEmail
+                                th= thesis.promoterEmail
+                                td= thesis.topicPolish
+                                td= thesis.topicEnglish
+                                td= thesis.language
+                div.NavButtons
+                    input(hidden=disabled type="submit" value="Go Back" formaction="/admin")

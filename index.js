@@ -100,6 +100,23 @@ app.get("/admin", (req, res) => {
         });
     });
 });
+app.get("/admin/theses", (req, res) => {
+    if (!firebaseWrapper.getCurrentUser()) {
+        res.redirect("/");
+        return;
+    }
+    firebaseWrapper.getAllTheses().then(theses => {
+        let thesesList = [];
+        theses.forEach(thesis => {
+            thesesList.push(thesis.data());
+        });
+        thesesList.sort((a, b) => a.status < b.status ? -1 : 1);
+        let options = {
+            theses: thesesList,
+        };
+        res.render("adminTheses", options);
+    });
+});
 app.get("/admin/createStudent", (req, res) => {
     if (!firebaseWrapper.getCurrentUser()) {
         res.redirect("/");
@@ -194,21 +211,8 @@ app.post("/admin/archivePromoter", urlencodedParser, (req, res) => {
 });
 
 function loadStudentWithThesis(res, email, thesis) {
-    firebaseWrapper.getAllSuggestedTheses().then(theses => {
         firebaseWrapper.getAllPromoters().then(promoters => {
             firebaseWrapper.getUser(email).then(student => {
-                let thesisList = [];
-                theses.forEach(ths => {
-                    thesisList.push(ths.data());
-                });
-                thesisList = thesisList.sort((a, b) =>
-                    !a.studentEmail
-                        ? !b.studentEmail
-                        ? a.promoterEmail < b.promoterEmail ? -1 : 1
-                        : -1
-                        : !b.studentEmail
-                        ? 1
-                        : a.promoterEmail < b.promoterEmail ? -1 : 1);
                 let promotersList = [];
                 promoters.forEach(promoter => {
                     promotersList.push(promoter.data());
@@ -219,7 +223,6 @@ function loadStudentWithThesis(res, email, thesis) {
                         firstName: student.get("firstName"),
                         lastName: student.get("lastName")
                     },
-                    theses: thesisList,
                     promoters: promotersList
                 };
                 if (thesis) {
@@ -233,7 +236,6 @@ function loadStudentWithThesis(res, email, thesis) {
                 res.render("student", options);
             });
         });
-    });
 }
 app.get("/student", (req, res) => {
     if (!firebaseWrapper.getCurrentUser()) {
@@ -275,6 +277,36 @@ app.post("/student/submitThesis", urlencodedParser, (req, res) => {
 
     firebaseWrapper.updateThesis(thesis).then(a => res.redirect("/student"));
 });
+app.get("/student/theses", (req, res) => {
+    if (!firebaseWrapper.getCurrentUser()) {
+        res.redirect("/");
+        return;
+    }
+    firebaseWrapper.getAllSuggestedTheses().then(theses => {
+        firebaseWrapper.getUser(firebaseWrapper.getCurrentUser().email).then(student => {
+            let thesisList = [];
+            theses.forEach(ths => {
+                thesisList.push(ths.data());
+            });
+            thesisList = thesisList.sort((a, b) =>
+                !a.studentEmail
+                    ? !b.studentEmail
+                    ? a.promoterEmail < b.promoterEmail ? -1 : 1
+                    : -1
+                    : !b.studentEmail
+                    ? 1
+                    : a.promoterEmail < b.promoterEmail ? -1 : 1);
+            let options = {
+                student: {
+                    firstName: student.get("firstName"),
+                    lastName: student.get("lastName")
+                },
+                theses: thesisList
+            };
+            res.render("studentTheses", options);
+        });
+    });
+});
 
 app.get("/promoter", (req, res) => {
     if (!firebaseWrapper.getCurrentUser()) {
@@ -295,11 +327,11 @@ app.get("/promoter", (req, res) => {
             };
             let thesesList = [];
 
-                theses.forEach(thesis => {
-                    thesesList.push(thesis.data());
-                });
-                options.theses = thesesList;
-                res.render("promoter", options);
+            theses.forEach(thesis => {
+                thesesList.push(thesis.data());
+            });
+            options.theses = thesesList;
+            res.render("promoter", options);
             }).catch(error => {
                 console.log(error);
                 res.redirect("/");
@@ -331,16 +363,26 @@ app.get("/promoter/rejectThesis", (req, res) => {
     }
 });
 
-app.get("/promoter/thesisSuggestion", (req, res) => {
+app.get("/promoter/suggest", (req, res) => {
     if (!firebaseWrapper.getCurrentUser()) {
         res.redirect("/");
         return;
     }
 
-    res.render("thesisSuggestion");
+    let promoterEmail = firebaseWrapper.getCurrentUser().email;
+    firebaseWrapper.getUser(promoterEmail).then(promoter => {
+        let options = {
+            promoter: {
+                title: promoter.get("title"),
+                firstName: promoter.get("firstName"),
+                lastName: promoter.get("lastName")
+            }
+        };
+        res.render("promoterSuggestion", options);
+    });
 });
-app.post("/promoter/thesisSuggestion", urlencodedParser, (req, res) => {
-    res.redirect("/promoter/thesisSuggestion");
+app.post("/promoter/suggest", urlencodedParser, (req, res) => {
+    res.redirect("/promoter/suggest");
 });
 app.post("/promoter/suggestThesis", urlencodedParser, (req, res) => {
     if (!firebaseWrapper.getCurrentUser()) {
@@ -362,7 +404,7 @@ app.post("/promoter/suggestThesis", urlencodedParser, (req, res) => {
 
     firebaseWrapper.suggestThesis(thesis);
 
-    res.redirect("/promoter/thesisSuggestion");
+    res.redirect("/promoter/suggest");
 });
 
 /**

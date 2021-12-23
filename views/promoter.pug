@@ -3,56 +3,39 @@ extends layout
 block layout-content
     div.View.UserView
         h1.Banner !{promoter.title} !{promoter.firstName} !{promoter.lastName}
-        table
-            tr
-                td
-                    div.Form
-                        div.Title
-                            h1 Suggest a topic
-                        form(method='POST' action="/promoter/suggestThesis")
-                            div.Details
-                                label(for="topicPolish" class="sr-only") Polish Topic
-                                input(type="text" name="topicPolish" id="topicPolish" class="form-control" placeholder="Polish Topic" required)
-                                label(for="topicEnglish" class="sr-only") English Topic
-                                input(type="text" name="topicEnglish" id="topicEnglish" class="form-control" placeholder="English Topic" required)
-                                label(for="language" class="sr-only") Language
-                                select(name="language" id="language" class="form-control")
-                                    each language in ["polish", "english"]
-                                        option= language
-                            div.NavButtons
-                                input(type="submit" name="accept" value="Suggest Thesis Topic")
-                td
-                    div.Form
-                        div.Title
-                            h1 Suggested Topics
-                        form.Details(method='POST' action="/student/acceptThesis")
-                            table(style = 'width:100%' border = '1')
-                                thead
-                                    tr
-                                        th= "Options"
-                                        th= "Status"
-                                        th= "Student Email"
-                                        th= "Polish Topic"
-                                        th= "English Topic"
-                                        th= "Language"
-                                tbody
-                                    for thesis in theses
-                                        if thesis.status === "PENDING"
-                                            tr.OPEN
-                                                td
-                                                    a.Link(href="/promoter/acceptThesis?studentEmail=" + thesis.studentEmail)= "ACCEPT"
-                                                    |  ||
-                                                    a.Link(href="/promoter/rejectThesis?studentEmail=" + thesis.studentEmail)= "REJECT"
-                                                td= thesis.status
-                                                td= thesis.studentEmail
-                                                td= thesis.topicPolish
-                                                td= thesis.topicEnglish
-                                                td= thesis.language
-                                        else
-                                            tr.UNAVAILABLE
-                                                td
-                                                td= thesis.status
-                                                td= thesis.studentEmail
-                                                td= thesis.topicPolish
-                                                td= thesis.topicEnglish
-                                                td= thesis.language
+        div.Form
+            div.Title
+                h1 Thesis Topics
+            form.Details(method='GET' action="/promoter/suggest")
+                table(style = 'width:100%' border = '1')
+                    thead
+                        tr
+                            th= "Options"
+                            th= "Status"
+                            th= "Student Email"
+                            th= "Polish Topic"
+                            th= "English Topic"
+                            th= "Language"
+                    tbody
+                        for thesis in theses
+                            if thesis.status === "PENDING"
+                                tr.OPEN
+                                    td
+                                        a.Link(href="/promoter/acceptThesis?studentEmail=" + thesis.studentEmail)= "ACCEPT"
+                                        |  ||
+                                        a.Link(href="/promoter/rejectThesis?studentEmail=" + thesis.studentEmail)= "REJECT"
+                                    td= thesis.status
+                                    td= thesis.studentEmail
+                                    td= thesis.topicPolish
+                                    td= thesis.topicEnglish
+                                    td= thesis.language
+                            else
+                                tr.UNAVAILABLE
+                                    td
+                                    td= thesis.status
+                                    td= thesis.studentEmail
+                                    td= thesis.topicPolish
+                                    td= thesis.topicEnglish
+                                    td= thesis.language
+                div.NavButtons
+                    input(type="submit" name="accept" value="Suggest Thesis Topic")

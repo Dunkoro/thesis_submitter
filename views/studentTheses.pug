@@ -1,0 +1,36 @@
+extends layout
+
+block layout-content
+    div.View.UserView
+        h1.Banner #{student.firstName} #{student.lastName}
+        div.Table
+            div.Title
+                h1 Suggested Topics
+            form(method='GET' action="/student")
+                table(style = 'width:100%' border = '1')
+                    thead
+                        tr
+                            th= "Option"
+                            th= "Polish Topic"
+                            th= "English Topic"
+                            th= "Language"
+                            th= "Promoter Email"
+                    tbody
+                        for thesis in theses
+                            if !thesis.studentEmail
+                                tr.OPEN
+                                    td
+                                        a.Link(href="/student/selectThesis?topicPolish="+thesis.topicPolish) SELECT
+                                    td= thesis.topicPolish
+                                    td= thesis.topicEnglish
+                                    td= thesis.language
+                                    td= thesis.promoterEmail
+                            else
+                                tr.UNAVAILABLE
+                                    td UNAVAILABLE
+                                    td= thesis.topicPolish
+                                    td= thesis.topicEnglish
+                                    td= thesis.language
+                                    td= thesis.promoterEmail
+                div.NavButtons
+                    input(hidden=disabled type="submit" value="Go Back" formaction="/student")

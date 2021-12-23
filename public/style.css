@@ -77,7 +77,7 @@ a {
     align-items: center;
 
     width: 100%;
-    height: 50px;
+    height: 70px;
 
     border-radius: 5px;
 
@@ -99,7 +99,23 @@ a {
     justify-content: center;
     align-items: center;
 
-    width: 100%;
+    width: 50%;
+
+    background: white;
+    padding: 25px;
+    border-bottom: var(--ui-shadow-border);
+    box-shadow: var(--ui-shadow);
+}
+.Table {
+    display: flex;
+    align-self: center;
+    justify-self: center;
+
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    width: 90%;
 
     background: white;
     padding: 25px;
@@ -112,12 +128,16 @@ a {
     justify-content: center;
     width: 100%;
 }
+.Input {
+    width: 90%;
+}
 .Details {
     display: flex;
     flex-direction: column;
     line-height: 1.5em;
+    font-size: 20px;
 
-    width: 90%;
+    width: 100%;
 }
 .NavButtons {
     width: 100%;
@@ -143,6 +163,7 @@ a {
 }
 
 .form {
+    width: available;
     padding: 15px;
     margin: auto;
 }
@@ -159,19 +180,24 @@ a {
 .form .form-control:focus {
     z-index: 2;
 }
-.form input {
-    margin-bottom: 10px;
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
+input {
+    font-size: 20px;
+}
+select {
+    font-size: 20px;
+}
+textarea {
+    font-size: 20px;
 }
 input[type=submit] {
-    background: darkred;
+    background: teal;
     color: white;
     border-style: outset;
-    border-color: darkred;
+    border-color: teal;
     height: 60px;
-    width: 300px;
-    font: bold 15px arial, sans-serif;
+    width: fit-content;
+    min-width: 100px;
+    font: bold 22px arial, sans-serif;
     text-shadow: none;
     margin: 10px;
 }

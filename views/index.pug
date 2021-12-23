@@ -6,14 +6,13 @@ block layout-content
         div.Form
             div.Title
                 h1 Log In
-            form(method='POST' action="/login")
+            form(method='POST' action="/login").Input
                 div.Details
-                    label( for="inputEmail" class="sr-only") Email address
+                    label(for="inputEmail" class="sr-only") Email address
                     input(type="email" name="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus)
                 div.Details
                     label(for="inputPassword" class="sr-only") Password
                     input(type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required)
-                br
                 div.NavButtons
                     input(type="submit" value="Log In")
         div.Form
