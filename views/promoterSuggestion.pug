@@ -17,4 +17,5 @@ block layout-content
                         each language in ["polish", "english"]
                             option= language
                 div.NavButtons
+                    input(hidden=disabled type="submit" formnovalidate=true value="Go Back" formaction="/promoter")
                     input(type="submit" name="accept" value="Suggest Thesis Topic")

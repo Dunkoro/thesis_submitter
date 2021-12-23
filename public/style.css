@@ -100,6 +100,7 @@ a {
     align-items: center;
 
     width: 50%;
+    max-height: 90%;
 
     background: white;
     padding: 25px;
@@ -108,19 +109,26 @@ a {
 }
 .Table {
     display: flex;
-    align-self: center;
-    justify-self: center;
+    align-self: safe center;
+    justify-self: safe center;
 
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    justify-content: safe center;
+    align-items: safe center;
 
-    width: 90%;
+    width: 95%;
+    max-height: 85%;
+
+    font-size: 20px;
 
     background: white;
     padding: 25px;
     border-bottom: var(--ui-shadow-border);
     box-shadow: var(--ui-shadow);
+}
+.Scroll {
+    overflow-y:auto;
+    height: 100%;
 }
 .Title {
     display: flex;
@@ -218,7 +226,7 @@ input:invalid {
 }
 table {
     width: 100%;
-    align-content: center;
+    align-content: safe center;
     border-collapse: collapse;
 }
 tr.OPEN {

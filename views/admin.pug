@@ -7,6 +7,7 @@ block layout-content
             tr
                 td
                     div.Table
+                        h1.Title Account Management
                         form(method='GET')
                             div.NavButtons
                                 input(type="submit" value="New Student Account" formaction="/admin/createStudent")
@@ -16,6 +17,7 @@ block layout-content
                                 input(type="submit" value="Archive Promoter Account" formaction="/admin/archivePromoter")
                 td
                     div.Table
+                        h1.Title Theses
                         form.Details
                             table(style = 'width:100%' border = '1')
                                 thead
@@ -32,4 +34,4 @@ block layout-content
                                         td= "Students with an accepted thesis declaration"
                                         td= accepted
                             div.NavButtons
-                                input(hidden=disabled formmethod="GET" type="submit" value="Theses" formaction="/admin/theses")
+                                input(hidden=disabled formmethod="GET" type="submit" value="See Thesis Titles" formaction="/admin/theses")

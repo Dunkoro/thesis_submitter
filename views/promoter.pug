@@ -3,7 +3,7 @@ extends layout
 block layout-content
     div.View.UserView
         h1.Banner !{promoter.title} !{promoter.firstName} !{promoter.lastName}
-        div.Form
+        div.Table
             div.Title
                 h1 Thesis Topics
             form.Details(method='GET' action="/promoter/suggest")

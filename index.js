@@ -338,6 +338,9 @@ app.get("/promoter", (req, res) => {
             });
     });
 });
+app.post("/promoter", urlencodedParser, (req, res) => {
+    res.redirect("/promoter");
+});
 app.get("/promoter/acceptThesis", (req, res) => {
     if (!firebaseWrapper.getCurrentUser()) {
         res.redirect("/");
@@ -362,7 +365,6 @@ app.get("/promoter/rejectThesis", (req, res) => {
         res.redirect("/promoter");
     }
 });
-
 app.get("/promoter/suggest", (req, res) => {
     if (!firebaseWrapper.getCurrentUser()) {
         res.redirect("/");

@@ -28,5 +28,5 @@ block layout-content
                     label(for="initialStructure" class="sr-only") Initial Structure
                     textarea(disabled=disabled name="initialStructure" rows="5" id="initialStructure" class="form-control" placeholder="Initial Structure" required) #{thesis.initialStructure}
                 div.NavButtons
-                    input(hidden=disabled formmethod="GET" type="submit" value="Suggested Theses" formaction="/student/theses")
+                    input(hidden=disabled formmethod="GET" type="submit" value="Suggested Theses" formaction="/student/theses" formnovalidate=true)
                     input(hidden=disabled type="submit" value="Submit Thesis")

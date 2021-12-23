@@ -71,7 +71,6 @@ async function getThesisByStudentEmail(email) {
 async function getThesesByPromoterEmail(email) {
     return await db.collection("theses")
         .where("promoterEmail", "==", email)
-        .where("archived", "==", false)
         .get();
 }
 

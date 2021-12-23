@@ -4,8 +4,8 @@ block layout-content
     div.View.AdminView
         h1.Banner Administrative Tools
         div.Table
-            form.Details
-                table(style = 'width:100%' border = '1')
+            div.Scroll
+                table(border = '1')
                     thead
                         tr
                             th= "Status"
@@ -23,5 +23,6 @@ block layout-content
                                 td= thesis.topicPolish
                                 td= thesis.topicEnglish
                                 td= thesis.language
+            form.Details
                 div.NavButtons
                     input(hidden=disabled type="submit" value="Go Back" formaction="/admin")
