@@ -3,35 +3,42 @@ extends layout
 block layout-content
     div.View.AdminView
         h1.Banner Administrative Tools
-        table
-            tr
-                td
-                    div.Table
-                        h1.Title Account Management
-                        form(method='GET')
-                            div.NavButtons
-                                input(type="submit" value="New Student Account" formaction="/admin/createStudent")
-                                input(type="submit" value="New Promoter Account" formaction="/admin/createPromoter")
-                            div.NavButtons
-                                input(type="submit" value="Archive Student Account" formaction="/admin/archiveStudent")
-                                input(type="submit" value="Archive Promoter Account" formaction="/admin/archivePromoter")
-                td
-                    div.Table
+        div.Table
+            table(style = 'width:100%')
+                tr
+                    th
                         h1.Title Theses
-                        form.Details
-                            table(style = 'width:100%' border = '1')
-                                thead
-                                    tr
-                                        th= "Category of students"
-                                        th= "Count"
-                                    tr
-                                        td= "Students without a thesis declaration"
-                                        td= notSubmitted
-                                    tr
-                                        td= "Students with a thesis declaration pending approval"
-                                        td= pendingApproval
-                                    tr
-                                        td= "Students with an accepted thesis declaration"
-                                        td= accepted
-                            div.NavButtons
-                                input(hidden=disabled formmethod="GET" type="submit" value="See Thesis Titles" formaction="/admin/theses")
+                    th
+                        h1.Title Account Management
+                tr
+                    td
+                        table(style = 'width:100%' border = '1')
+                            thead
+                                tr
+                                    th= "Category of students"
+                                    th= "Count"
+                                tr
+                                    td= "Students without a thesis declaration"
+                                    td= notSubmitted
+                                tr
+                                    td= "Students with a thesis declaration pending approval"
+                                    td= pendingApproval
+                                tr
+                                    td= "Students with an accepted thesis declaration"
+                                    td= accepted
+                        div.NavButtons
+                            form(method='GET')
+                                input(type="submit" value="See Theses" formaction="/admin/theses")
+                    td
+                        table(style = 'width:100%')
+                            form(method='GET')
+                                tr
+                                    td(style="text-align:center")
+                                        input(type="submit" value="New Student Account" formaction="/admin/createStudent").Button
+                                    td(style="text-align:center")
+                                        input(type="submit" value="New Promoter Account" formaction="/admin/createPromoter").Button
+                                tr
+                                    td(style="text-align:center")
+                                        input(type="submit" value="Archive Student Account" formaction="/admin/archiveStudent").Button
+                                    td(style="text-align:center")
+                                        input(type="submit" value="Archive Promoter Account" formaction="/admin/archivePromoter").Button

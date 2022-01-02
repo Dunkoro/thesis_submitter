@@ -20,7 +20,7 @@ block layout-content
                         for thesis in theses
                             if thesis.status === "PENDING"
                                 tr.OPEN
-                                    td
+                                    td.Options
                                         a.Link(href="/promoter/acceptThesis?studentEmail=" + thesis.studentEmail)= "ACCEPT"
                                         |  ||
                                         a.Link(href="/promoter/rejectThesis?studentEmail=" + thesis.studentEmail)= "REJECT"

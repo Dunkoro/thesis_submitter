@@ -107,6 +107,23 @@ a {
     border-bottom: var(--ui-shadow-border);
     box-shadow: var(--ui-shadow);
 }
+.Account {
+    display: flex;
+    align-self: center;
+    justify-self: center;
+
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    width: 30%;
+    max-height: 90%;
+
+    background: white;
+    padding: 25px;
+    border-bottom: var(--ui-shadow-border);
+    box-shadow: var(--ui-shadow);
+}
 .Table {
     display: flex;
     align-self: safe center;
@@ -169,6 +186,12 @@ a {
     background: url("https://upload.wikimedia.org/wikipedia/commons/2/24/Main_Building_of_Faculty_of_Architecture_of_Politechnika_Wroc%C5%82awska_%28Poland%2C_February_2013%29.jpg") left bottom;
     background-size: cover;
 }
+td.Options {
+    width: 170px
+}
+td.Button {
+    align-content: center;
+}
 
 .form {
     width: available;
@@ -216,6 +239,9 @@ input[type=submit]:disabled {
     border-color: darkgray;
     font: bold 15px arial, sans-serif;
     text-shadow:none;
+}
+input.Button {
+    width: 300px;
 }
 textarea {
     max-height: 100%;

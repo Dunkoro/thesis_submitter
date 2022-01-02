@@ -2,7 +2,7 @@ extends layout
 
 block layout-content
     div.View.AdminView
-        div.Form
+        div.Account
             div.Title
                 h1 Student Archiving
             form.Details(method='POST' action="/admin/archiveStudent")
@@ -11,4 +11,5 @@ block layout-content
                         each student in students
                             option(value=student.email)= student.email + " | " + student.firstName + " " + student.lastName
                 div.NavButtons
+                    input(type="submit" value="Go Back" formaction="/admin" formnovalidate=true)
                     input(type="submit" value="Archive the Student")

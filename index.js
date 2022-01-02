@@ -100,6 +100,9 @@ app.get("/admin", (req, res) => {
         });
     });
 });
+app.post("/admin", urlencodedParser, (req, res) => {
+    res.redirect("/admin");
+});
 app.get("/admin/theses", (req, res) => {
     if (!firebaseWrapper.getCurrentUser()) {
         res.redirect("/");
@@ -330,6 +333,7 @@ app.get("/promoter", (req, res) => {
             theses.forEach(thesis => {
                 thesesList.push(thesis.data());
             });
+            thesesList.sort((a, b) => a.status < b.status ? -1 : 1);
             options.theses = thesesList;
             res.render("promoter", options);
             }).catch(error => {

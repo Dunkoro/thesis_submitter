@@ -4,9 +4,7 @@ block layout-content
     div.View.UserView
         h1.Banner #{student.firstName} #{student.lastName}
         div.Table
-            div.Title
-                h1 Suggested Topics
-            form(method='GET' action="/student")
+            div.Scroll
                 table(style = 'width:100%' border = '1')
                     thead
                         tr
@@ -32,5 +30,5 @@ block layout-content
                                     td= thesis.topicEnglish
                                     td= thesis.language
                                     td= thesis.promoterEmail
-                div.NavButtons
-                    input(hidden=disabled type="submit" value="Go Back" formaction="/student")
+            div.NavButtons
+                input(hidden=disabled type="submit" value="Go Back" formaction="/student")
